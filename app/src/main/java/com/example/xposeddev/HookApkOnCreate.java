@@ -13,7 +13,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class HookClassOnCreate implements IXposedHookLoadPackage {
+public class HookApkOnCreate implements IXposedHookLoadPackage {
     public static Field getClassField(ClassLoader classLoader, String className, String fieldName){
         try{
             Class clazz = classLoader.loadClass(className);
