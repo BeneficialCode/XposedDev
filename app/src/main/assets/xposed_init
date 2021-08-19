@@ -1,3 +1,4 @@
 com.example.xposeddev.HookTest
 com.example.xposeddev.HookDexClassLoader
 com.example.xposeddev.HookJava
+com.example.xposeddev.HookActiveInvoke

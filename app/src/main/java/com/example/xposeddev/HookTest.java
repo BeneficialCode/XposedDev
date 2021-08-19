@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 
 public class HookTest implements IXposedHookLoadPackage {
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        XposedBridge.log("Loaded app: " + lpparam.packageName);
+        // XposedBridge.log("Loaded app: " + lpparam.packageName);
         if (!lpparam.packageName.equals("com.qtz.game.jltx"))
             return;
         // hook构造函数
