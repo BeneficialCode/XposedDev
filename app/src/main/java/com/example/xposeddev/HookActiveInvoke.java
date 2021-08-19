@@ -1,5 +1,9 @@
 package com.example.xposeddev;
 
+import android.app.Application;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
