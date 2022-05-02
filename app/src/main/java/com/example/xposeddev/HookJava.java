@@ -11,7 +11,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 /*
 implements IXposedHookLoadPackage {
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable {
-    	if (!lpparam.packageName.equals("com.android.systemui"))
+    	if (!lpparam.packageName.equals("com.qtz.game.jltx"))
             return;
 
     }
