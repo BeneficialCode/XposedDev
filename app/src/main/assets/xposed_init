@@ -3,3 +3,4 @@ com.example.xposeddev.HookDexClassLoader
 com.example.xposeddev.HookJava
 com.example.xposeddev.HookActiveInvoke
 com.example.xposeddev.HookActivityOnCreate
+com.example.xposeddev.HookSo

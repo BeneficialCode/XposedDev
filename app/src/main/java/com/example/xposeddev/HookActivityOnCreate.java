@@ -3,6 +3,7 @@ package com.example.xposeddev;
 import android.app.Application;
 import android.os.Bundle;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -97,6 +98,7 @@ public class HookActivityOnCreate implements IXposedHookLoadPackage {
     public void GetClassLoaderClassList(ClassLoader classLoader){
         XposedBridge.log("start deal with classloader:"+classLoader);
         Object pathList = XposedHelpers.getObjectField(classLoader,"pathList");
+
         Object[] dexElements = (Object[]) XposedHelpers.getObjectField(pathList,"dexElements");
         for(Object dexElement:dexElements){
             Object dexFile = XposedHelpers.getObjectField(dexElement,"dexFile");
@@ -104,15 +106,40 @@ public class HookActivityOnCreate implements IXposedHookLoadPackage {
             Class clazz = XposedHelpers.findClass("dalvik.system.DexFile",classLoader);
             String[] classNameList = (String[]) XposedHelpers.callStaticMethod(clazz,"getClassNameList",mCookie);
             for(String className:classNameList){
-                XposedBridge.log(dexFile+"---"+className);
+                //XposedBridge.log(dexFile+"---"+className);
             }
         }
         XposedBridge.log("end deal with class loader: "+classLoader);
     }
 
+    public void GetClassLoaderNativeLibPathList(ClassLoader classLoader){
+        Object pathList = XposedHelpers.getObjectField(classLoader,"pathList");
+        Object[] nativeLibraryPathElements = (Object[]) XposedHelpers.getObjectField(pathList,"nativeLibraryPathElements");
+        for(Object nativeLibraryPathElement:nativeLibraryPathElements){
+            File path = (File) XposedHelpers.getObjectField(nativeLibraryPathElement,"path");
+            XposedBridge.log("path-->"+path);
+        }
+    }
+
+
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (!lpparam.packageName.equals("com.qtz.game.jltx"))
             return;
+
+        ClassLoader classLoader = lpparam.classLoader;
+
+        GetClassLoaderClassList(classLoader);
+        ClassLoader parent = classLoader.getParent();
+        while(parent!=null){
+            XposedBridge.log("parent->"+parent);
+            if(parent.toString().contains("BootClassLoader")){
+                XposedBridge.log("find BootClassLoader");
+            }
+            else{
+                GetClassLoaderClassList(parent);
+            }
+            parent=parent.getParent();
+        }
 
         XposedBridge.log("hook "+lpparam.packageName);
         // com.qtz.game.main.Logo
@@ -123,7 +150,8 @@ public class HookActivityOnCreate implements IXposedHookLoadPackage {
         }
 
 
-        XposedHelpers.findAndHookMethod("com.qtz.game.main.Logo", lpparam.classLoader, "onCreate",Bundle.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.qtz.game.main.Logo", lpparam.classLoader, "onCreate",
+                Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
@@ -134,6 +162,10 @@ public class HookActivityOnCreate implements IXposedHookLoadPackage {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
                 XposedBridge.log("com.qtz.game.main.Logo->onCreate after hook");
+                ClassLoader classLoader = getClassLoader();
+                GetClassLoaderClassList(classLoader);
+
+                GetClassLoaderNativeLibPathList(classLoader);
             }
         });
     }
